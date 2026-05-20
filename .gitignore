@@ -72,6 +72,10 @@ __pycache__/
 *.sqlite
 *.db
 
+# Track schema-only database exports for setup/migration
+!backend/database/schema/
+!backend/database/schema/*.sql
+
 # Large document files (optional - uncomment if you don't want to upload test files)
 # *.docx
 # *.pdf
