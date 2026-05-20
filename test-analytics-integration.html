@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Integration Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .test-section { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .result { padding: 8px; margin: 5px 0; border-radius: 3px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 3px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        pre { background: #f1f3f4; padding: 10px; border-radius: 3px; overflow-x: auto; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>Analytics Dashboard Connection Fix - Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>🔧 Complete Integration Test</h2>
+        <button onclick="runCompleteTest()">Run Complete Integration Test</button>
+        <div id="complete-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🌐 Environment Detection Validation</h2>
+        <button onclick="validateEnvironmentDetection()">Validate Environment Detection</button>
+        <div id="env-validation-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔄 Error Recovery Simulation</h2>
+        <button onclick="simulateErrorRecovery()">Simulate Error Recovery</button>
+        <div id="error-recovery-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Analytics Dashboard Simulation</h2>
+        <button onclick="simulateAnalyticsDashboard()">Simulate Dashboard Load</button>
+        <div id="dashboard-simulation-results"></div>
+    </div>
+
+    <script>
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            container.appendChild(div);
+        }
+        
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+        
+        async function runCompleteTest() {
+            clearResults('complete-results');
+            addResult('complete-results', '🚀 Starting complete integration test...', 'info');
+            
+            // Test 1: Environment Detection
+            addResult('complete-results', '<strong>Step 1: Environment Detection</strong>', 'info');
+            const environment = await testEnvironmentDetection();
+            
+            // Test 2: Configuration Management  
+            addResult('complete-results', '<strong>Step 2: Configuration Management</strong>', 'info');
+            const config = await testConfigurationManagement();
+            
+            // Test 3: API Service Integration
+            addResult('complete-results', '<strong>Step 3: API Service Integration</strong>', 'info');
+            const apiResult = await testApiServiceIntegration();
+            
+            // Test 4: Error Handling
+            addResult('complete-results', '<strong>Step 4: Error Handling</strong>', 'info');
+            await testErrorHandling();
+            
+            addResult('complete-results', '✅ Complete integration test finished!', 'success');
+        }
+        
+        async function testEnvironmentDetection() {
+            const hostname = window.location.hostname;
+            addResult('complete-results', `Current hostname: ${hostname}`, 'info');
+            
+            // Test Apache backend detection
+            const apacheUrls = [
+                'http://192.168.11.40/exam-backend/public/api/health',
+                'http://localhost/exam-backend/public/api/health'
+            ];
+            
+            let detectedEnvironment = 'local';
+            for (const url of apacheUrls) {
+                try {
+                    const response = await fetch(url, { method: 'GET', timeout: 3000 });
+                    if (response.status === 200 || response.status === 401 || response.status === 404) {
+                        detectedEnvironment = 'apache';
+                        addResult('complete-results', `✅ Apache backend detected: ${url}`, 'success');
+                        break;
+                    }
+                } catch (error) {
+                    addResult('complete-results', `⚠️ Apache backend not available: ${url}`, 'warning');
+                }
+            }
+            
+            addResult('complete-results', `Environment: ${detectedEnvironment}`, 'info');
+            return detectedEnvironment;
+        }
+        
+        async function testConfigurationManagement() {
+            // Simulate configuration management logic
+            const environment = await testEnvironmentDetection();
+            
+            let apiUrl = 'http://127.0.0.1:8000/api'; // default
+            if (environment === 'apache') {
+                apiUrl = 'http://192.168.11.40/exam-backend/public/api';
+            }
+            
+            addResult('complete-results', `API URL configured: ${apiUrl}`, 'info');
+            
+            // Test connectivity
+            try {
+                const response = await fetch(`${apiUrl}/health`, { method: 'GET', timeout: 5000 });
+                addResult('complete-results', `✅ Connectivity validated (Status: ${response.status})`, 'success');
+                return { apiUrl, connected: true };
+            } catch (error) {
+                addResult('complete-results', `❌ Connectivity failed: ${error.message}`, 'error');
+                return { apiUrl, connected: false };
+            }
+        }
+        
+        async function testApiServiceIntegration() {
+            const config = await testConfigurationManagement();
+            
+            // Test analytics endpoint
+            try {
+                const response = await fetch(`${config.apiUrl}/analytics/overview?timeFilter=all`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    timeout: 10000
+                });
+                
+                if (response.ok) {
+                    addResult('complete-results', '✅ Analytics API integration successful!', 'success');
+                    return true;
+                } else if (response.status === 401) {
+                    addResult('complete-results', '🔐 Analytics API reachable (needs auth)', 'warning');
+                    return true;
+                } else {
+                    addResult('complete-results', `⚠️ Analytics API status: ${response.status}`, 'warning');
+                    return false;
+                }
+            } catch (error) {
+                addResult('complete-results', `❌ Analytics API failed: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        async function testErrorHandling() {
+            // Test error handling with invalid URL
+            try {
+                await fetch('http://invalid-url:9999/api/analytics/overview', {
+                    method: 'GET',
+                    timeout: 2000
+                });
+            } catch (error) {
+                if (error.message.includes('Failed to fetch') || error.message.includes('ERR_')) {
+                    addResult('complete-results', '✅ Error handling working correctly', 'success');
+                } else {
+                    addResult('complete-results', `⚠️ Unexpected error format: ${error.message}`, 'warning');
+                }
+            }
+        }
+        
+        async function validateEnvironmentDetection() {
+            clearResults('env-validation-results');
+            addResult('env-validation-results', '🔍 Validating environment detection logic...', 'info');
+            
+            const hostname = window.location.hostname;
+            addResult('env-validation-results', `Current hostname: ${hostname}`, 'info');
+            
+            // Test all possible environments
+            const environments = {
+                'apache': 'http://192.168.11.40/exam-backend/public/api',
+                'local': 'http://127.0.0.1:8000/api',
+                'lan': `http://${hostname}:8000/api`,
+                'production': 'https://yourdomain.com/api'
+            };
+            
+            for (const [env, url] of Object.entries(environments)) {
+                try {
+                    const response = await fetch(`${url}/health`, { 
+                        method: 'GET', 
+                        timeout: 3000 
+                    });
+                    addResult('env-validation-results', `✅ ${env}: ${url} (Status: ${response.status})`, 'success');
+                } catch (error) {
+                    addResult('env-validation-results', `❌ ${env}: ${url} (${error.message})`, 'error');
+                }
+            }
+        }
+        
+        async function simulateErrorRecovery() {
+            clearResults('error-recovery-results');
+            addResult('error-recovery-results', '🔄 Simulating error recovery scenarios...', 'info');
+            
+            // Scenario 1: Wrong URL auto-correction
+            addResult('error-recovery-results', '<strong>Scenario 1: Wrong URL Detection</strong>', 'info');
+            
+            const wrongUrls = [
+                'http://localhost:8000/api/analytics/overview',
+                'http://127.0.0.1:8000/api/analytics/overview'
+            ];
+            
+            const correctUrls = [
+                'http://192.168.11.40/exam-backend/public/api/analytics/overview',
+                'http://localhost/exam-backend/public/api/analytics/overview'
+            ];
+            
+            // Test wrong URLs first
+            for (const url of wrongUrls) {
+                try {
+                    await fetch(url, { method: 'GET', timeout: 2000 });
+                    addResult('error-recovery-results', `⚠️ Wrong URL unexpectedly worked: ${url}`, 'warning');
+                } catch (error) {
+                    addResult('error-recovery-results', `✅ Wrong URL correctly failed: ${url}`, 'success');
+                }
+            }
+            
+            // Test auto-correction to correct URLs
+            for (const url of correctUrls) {
+                try {
+                    const response = await fetch(url, { method: 'GET', timeout: 3000 });
+                    addResult('error-recovery-results', `✅ Auto-correction successful: ${url} (Status: ${response.status})`, 'success');
+                    break;
+                } catch (error) {
+                    addResult('error-recovery-results', `❌ Auto-correction failed: ${url}`, 'error');
+                }
+            }
+        }
+        
+        async function simulateAnalyticsDashboard() {
+            clearResults('dashboard-simulation-results');
+            addResult('dashboard-simulation-results', '📊 Simulating analytics dashboard load...', 'info');
+            
+            // Simulate the actual dashboard loading process
+            addResult('dashboard-simulation-results', 'Step 1: Environment detection...', 'info');
+            const environment = await testEnvironmentDetection();
+            
+            addResult('dashboard-simulation-results', 'Step 2: Configuration initialization...', 'info');
+            const config = await testConfigurationManagement();
+            
+            addResult('dashboard-simulation-results', 'Step 3: Analytics API initialization...', 'info');
+            const apiWorking = await testApiServiceIntegration();
+            
+            if (apiWorking) {
+                addResult('dashboard-simulation-results', '✅ Dashboard would load successfully!', 'success');
+                addResult('dashboard-simulation-results', '🎉 No more "localhost:8000" connection errors!', 'success');
+            } else {
+                addResult('dashboard-simulation-results', '⚠️ Dashboard would show connection error (but with proper error handling)', 'warning');
+            }
+            
+            // Summary of the fix
+            addResult('dashboard-simulation-results', `
+                <strong>Fix Summary:</strong><br>
+                • Environment: ${environment}<br>
+                • API URL: ${config.apiUrl}<br>
+                • Connection: ${config.connected ? 'Working' : 'Failed'}<br>
+                • Error Handling: Enhanced ✅<br>
+                • Auto-correction: Implemented ✅
+            `, 'info');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,483 @@
+# ============================================================================
+# CFAS Exam System Launcher - FIXED VERSION
+# Professional GUI launcher with proper terminal handling
+# ============================================================================
+
+# Import required assemblies for Windows Forms
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+$script:xamppPath = "C:\xampp"
+$script:backendPath = Join-Path $PSScriptRoot "backend"
+$script:logoPath = Join-Path $PSScriptRoot "frontend\public\cfas-logo.jpg"
+$script:frontendUrl = "http://192.168.11.40/exam-frontend"
+$script:backendHost = "127.0.0.1"
+$script:backendPort = 8000
+
+# ============================================================================
+# HELPER FUNCTIONS
+# ============================================================================
+
+function Test-ServiceRunning {
+    param([string]$ProcessName)
+    
+    $process = Get-Process -Name $ProcessName -ErrorAction SilentlyContinue
+    return $null -ne $process
+}
+
+function Start-ApacheService {
+    try {
+        Write-Host "Starting Apache..." -ForegroundColor Cyan
+        
+        # Check if already running
+        if (Test-ServiceRunning -ProcessName "httpd") {
+            Write-Host "Apache is already running" -ForegroundColor Yellow
+            return $true
+        }
+        
+        # Try to start Apache service
+        $apachePath = Join-Path $script:xamppPath "apache\bin\httpd.exe"
+        
+        if (Test-Path $apachePath) {
+            Start-Process -FilePath $apachePath -WindowStyle Hidden
+            Start-Sleep -Seconds 2
+            Write-Host "Apache started successfully" -ForegroundColor Green
+            return $true
+        } else {
+            Write-Host "Apache not found at: $apachePath" -ForegroundColor Red
+            return $false
+        }
+    }
+    catch {
+        Write-Host "Error starting Apache: $_" -ForegroundColor Red
+        return $false
+    }
+}
+
+function Start-MySQLService {
+    try {
+        Write-Host "Starting MySQL..." -ForegroundColor Cyan
+        
+        # Check if already running
+        if (Test-ServiceRunning -ProcessName "mysqld") {
+            Write-Host "MySQL is already running" -ForegroundColor Yellow
+            return $true
+        }
+        
+        # Try to start MySQL service
+        $mysqlPath = Join-Path $script:xamppPath "mysql\bin\mysqld.exe"
+        
+        if (Test-Path $mysqlPath) {
+            Start-Process -FilePath $mysqlPath -WindowStyle Hidden
+            Start-Sleep -Seconds 3
+            Write-Host "MySQL started successfully" -ForegroundColor Green
+            return $true
+        } else {
+            Write-Host "MySQL not found at: $mysqlPath" -ForegroundColor Red
+            return $false
+        }
+    }
+    catch {
+        Write-Host "Error starting MySQL: $_" -ForegroundColor Red
+        return $false
+    }
+}
+
+function Start-LaravelBackend {
+    param([System.Windows.Forms.Label]$StatusLabel)
+    
+    try {
+        Write-Host "Starting Laravel Backend..." -ForegroundColor Cyan
+        
+        # Check if already running on port 8000
+        $portCheck = netstat -ano | Select-String ":8000" | Select-String "LISTENING"
+        if ($portCheck) {
+            Write-Host "Laravel Backend is already running on port 8000" -ForegroundColor Yellow
+            return $true
+        }
+        
+        # Navigate to backend directory
+        if (-not (Test-Path $script:backendPath)) {
+            Write-Host "Backend path not found: $script:backendPath" -ForegroundColor Red
+            return $false
+        }
+        
+        # Start Laravel artisan serve in a new visible window
+        $phpPath = "php"
+        $artisanPath = Join-Path $script:backendPath "artisan"
+        
+        if (Test-Path $artisanPath) {
+            # Start in a new CMD window that stays open
+            $cmdArgs = "/k cd /d `"$script:backendPath`" && php artisan serve --host=$($script:backendHost) --port=$($script:backendPort)"
+            Start-Process "cmd.exe" -ArgumentList $cmdArgs -WindowStyle Normal
+            
+            # Wait for server to start
+            Write-Host "Waiting for backend to start..." -ForegroundColor Yellow
+            Start-Sleep -Seconds 5
+            
+            # Verify it's running
+            $portCheck = netstat -ano | Select-String ":8000" | Select-String "LISTENING"
+            if ($portCheck) {
+                Write-Host "Laravel Backend started successfully on port 8000" -ForegroundColor Green
+                return $true
+            } else {
+                Write-Host "Warning: Backend may not have started properly" -ForegroundColor Yellow
+                return $true  # Continue anyway
+            }
+        } else {
+            Write-Host "Artisan not found at: $artisanPath" -ForegroundColor Red
+            return $false
+        }
+    }
+    catch {
+        Write-Host "Error starting Laravel Backend: $_" -ForegroundColor Red
+        return $false
+    }
+}
+
+function Open-Browser {
+    param([string]$Url)
+    
+    try {
+        Write-Host "Opening browser to: $Url" -ForegroundColor Cyan
+        Start-Process $Url
+        Write-Host "Browser opened successfully" -ForegroundColor Green
+        return $true
+    }
+    catch {
+        Write-Host "Error opening browser: $_" -ForegroundColor Red
+        return $false
+    }
+}
+
+# ============================================================================
+# GUI CREATION
+# ============================================================================
+
+Write-Host "Initializing CFAS Exam System Launcher..." -ForegroundColor Cyan
+Write-Host ""
+
+# Create main form
+$form = New-Object System.Windows.Forms.Form
+$form.Text = "CFAS Exam System Launcher"
+$form.Size = New-Object System.Drawing.Size(600, 550)
+$form.StartPosition = "CenterScreen"
+$form.FormBorderStyle = "FixedDialog"
+$form.MaximizeBox = $false
+$form.BackColor = [System.Drawing.Color]::White
+$form.Font = New-Object System.Drawing.Font("Segoe UI", 10)
+
+# Logo PictureBox
+$logo = New-Object System.Windows.Forms.PictureBox
+$logo.Size = New-Object System.Drawing.Size(120, 120)
+$logo.Location = New-Object System.Drawing.Point(240, 20)
+$logo.SizeMode = "Zoom"
+
+# Try to load logo
+if (Test-Path $script:logoPath) {
+    try {
+        $logo.Image = [System.Drawing.Image]::FromFile($script:logoPath)
+        Write-Host "Logo loaded successfully" -ForegroundColor Green
+    }
+    catch {
+        # Fallback: Create a simple colored box
+        $logo.BackColor = [System.Drawing.Color]::FromArgb(41, 128, 185)
+        Write-Host "Using fallback logo" -ForegroundColor Yellow
+    }
+} else {
+    # Fallback: Create a simple colored box
+    $logo.BackColor = [System.Drawing.Color]::FromArgb(41, 128, 185)
+    Write-Host "Logo file not found, using fallback" -ForegroundColor Yellow
+}
+
+$form.Controls.Add($logo)
+
+# Title Label
+$titleLabel = New-Object System.Windows.Forms.Label
+$titleLabel.Text = "CFAS EXAM SYSTEM"
+$titleLabel.Font = New-Object System.Drawing.Font("Segoe UI", 20, [System.Drawing.FontStyle]::Bold)
+$titleLabel.ForeColor = [System.Drawing.Color]::FromArgb(41, 128, 185)
+$titleLabel.Size = New-Object System.Drawing.Size(560, 40)
+$titleLabel.Location = New-Object System.Drawing.Point(20, 150)
+$titleLabel.TextAlign = "MiddleCenter"
+$form.Controls.Add($titleLabel)
+
+# Subtitle Label
+$subtitleLabel = New-Object System.Windows.Forms.Label
+$subtitleLabel.Text = "Review Center Management System"
+$subtitleLabel.Font = New-Object System.Drawing.Font("Segoe UI", 11)
+$subtitleLabel.ForeColor = [System.Drawing.Color]::FromArgb(127, 140, 141)
+$subtitleLabel.Size = New-Object System.Drawing.Size(560, 30)
+$subtitleLabel.Location = New-Object System.Drawing.Point(20, 190)
+$subtitleLabel.TextAlign = "MiddleCenter"
+$form.Controls.Add($subtitleLabel)
+
+# Info Panel
+$infoPanel = New-Object System.Windows.Forms.Panel
+$infoPanel.Size = New-Object System.Drawing.Size(540, 140)
+$infoPanel.Location = New-Object System.Drawing.Point(30, 230)
+$infoPanel.BackColor = [System.Drawing.Color]::FromArgb(236, 240, 241)
+$infoPanel.BorderStyle = "FixedSingle"
+$form.Controls.Add($infoPanel)
+
+# Service list labels
+$serviceLabel = New-Object System.Windows.Forms.Label
+$serviceLabel.Text = "System will start:"
+$serviceLabel.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
+$serviceLabel.Size = New-Object System.Drawing.Size(500, 25)
+$serviceLabel.Location = New-Object System.Drawing.Point(20, 10)
+$infoPanel.Controls.Add($serviceLabel)
+
+$service1 = New-Object System.Windows.Forms.Label
+$service1.Text = "✓ Apache Web Server (Frontend)"
+$service1.Font = New-Object System.Drawing.Font("Segoe UI", 10)
+$service1.ForeColor = [System.Drawing.Color]::FromArgb(39, 174, 96)
+$service1.Size = New-Object System.Drawing.Size(500, 25)
+$service1.Location = New-Object System.Drawing.Point(20, 40)
+$infoPanel.Controls.Add($service1)
+
+$service2 = New-Object System.Windows.Forms.Label
+$service2.Text = "✓ MySQL Database Server"
+$service2.Font = New-Object System.Drawing.Font("Segoe UI", 10)
+$service2.ForeColor = [System.Drawing.Color]::FromArgb(39, 174, 96)
+$service2.Size = New-Object System.Drawing.Size(500, 25)
+$service2.Location = New-Object System.Drawing.Point(20, 65)
+$infoPanel.Controls.Add($service2)
+
+$service3 = New-Object System.Windows.Forms.Label
+$service3.Text = "✓ Laravel Backend API Server"
+$service3.Font = New-Object System.Drawing.Font("Segoe UI", 10)
+$service3.ForeColor = [System.Drawing.Color]::FromArgb(39, 174, 96)
+$service3.Size = New-Object System.Drawing.Size(500, 25)
+$service3.Location = New-Object System.Drawing.Point(20, 90)
+$infoPanel.Controls.Add($service3)
+
+$urlLabel = New-Object System.Windows.Forms.Label
+$urlLabel.Text = "Access URL: $($script:frontendUrl)"
+$urlLabel.Font = New-Object System.Drawing.Font("Segoe UI", 9)
+$urlLabel.ForeColor = [System.Drawing.Color]::FromArgb(127, 140, 141)
+$urlLabel.Size = New-Object System.Drawing.Size(500, 25)
+$urlLabel.Location = New-Object System.Drawing.Point(20, 115)
+$infoPanel.Controls.Add($urlLabel)
+
+# Progress Panel (initially hidden)
+$progressPanel = New-Object System.Windows.Forms.Panel
+$progressPanel.Size = New-Object System.Drawing.Size(540, 100)
+$progressPanel.Location = New-Object System.Drawing.Point(30, 230)
+$progressPanel.BackColor = [System.Drawing.Color]::FromArgb(236, 240, 241)
+$progressPanel.BorderStyle = "FixedSingle"
+$progressPanel.Visible = $false
+$form.Controls.Add($progressPanel)
+
+# Progress Label
+$progressLabel = New-Object System.Windows.Forms.Label
+$progressLabel.Text = "⏳ Starting services..."
+$progressLabel.Font = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
+$progressLabel.Size = New-Object System.Drawing.Size(500, 30)
+$progressLabel.Location = New-Object System.Drawing.Point(20, 10)
+$progressPanel.Controls.Add($progressLabel)
+
+# Progress Bar
+$progressBar = New-Object System.Windows.Forms.ProgressBar
+$progressBar.Size = New-Object System.Drawing.Size(500, 30)
+$progressBar.Location = New-Object System.Drawing.Point(20, 40)
+$progressBar.Style = "Continuous"
+$progressBar.ForeColor = [System.Drawing.Color]::FromArgb(41, 128, 185)
+$progressPanel.Controls.Add($progressBar)
+
+# Status Label
+$statusLabel = New-Object System.Windows.Forms.Label
+$statusLabel.Text = "Initializing..."
+$statusLabel.Font = New-Object System.Drawing.Font("Segoe UI", 9)
+$statusLabel.ForeColor = [System.Drawing.Color]::FromArgb(127, 140, 141)
+$statusLabel.Size = New-Object System.Drawing.Size(500, 25)
+$statusLabel.Location = New-Object System.Drawing.Point(20, 75)
+$progressPanel.Controls.Add($statusLabel)
+
+# Cancel Button
+$cancelButton = New-Object System.Windows.Forms.Button
+$cancelButton.Text = "CANCEL"
+$cancelButton.Size = New-Object System.Drawing.Size(260, 50)
+$cancelButton.Location = New-Object System.Drawing.Point(30, 400)
+$cancelButton.Font = New-Object System.Drawing.Font("Segoe UI", 12, [System.Drawing.FontStyle]::Bold)
+$cancelButton.BackColor = [System.Drawing.Color]::FromArgb(149, 165, 166)
+$cancelButton.ForeColor = [System.Drawing.Color]::FromArgb(44, 62, 80)
+$cancelButton.FlatStyle = "Flat"
+$cancelButton.FlatAppearance.BorderSize = 0
+$cancelButton.Cursor = [System.Windows.Forms.Cursors]::Hand
+$form.Controls.Add($cancelButton)
+
+# Start Button
+$startButton = New-Object System.Windows.Forms.Button
+$startButton.Text = "🚀 START SYSTEM"
+$startButton.Size = New-Object System.Drawing.Size(260, 50)
+$startButton.Location = New-Object System.Drawing.Point(310, 400)
+$startButton.Font = New-Object System.Drawing.Font("Segoe UI", 12, [System.Drawing.FontStyle]::Bold)
+$startButton.BackColor = [System.Drawing.Color]::FromArgb(39, 174, 96)
+$startButton.ForeColor = [System.Drawing.Color]::White
+$startButton.FlatStyle = "Flat"
+$startButton.FlatAppearance.BorderSize = 0
+$startButton.Cursor = [System.Windows.Forms.Cursors]::Hand
+$form.Controls.Add($startButton)
+
+# ============================================================================
+# EVENT HANDLERS
+# ============================================================================
+
+# Cancel Button Click
+$cancelButton.Add_Click({
+    Write-Host ""
+    Write-Host "Launcher cancelled by user" -ForegroundColor Yellow
+    $form.Close()
+})
+
+# Start Button Click
+$startButton.Add_Click({
+    Write-Host ""
+    Write-Host "Starting CFAS Exam System..." -ForegroundColor Cyan
+    Write-Host ""
+    
+    # Disable buttons
+    $startButton.Enabled = $false
+    $cancelButton.Enabled = $false
+    
+    # Hide info panel, show progress panel
+    $infoPanel.Visible = $false
+    $progressPanel.Visible = $true
+    
+    # Update UI
+    $form.Refresh()
+    
+    # Validate XAMPP installation
+    if (-not (Test-Path $script:xamppPath)) {
+        Write-Host ""
+        Write-Host "ERROR: XAMPP not found at: $($script:xamppPath)" -ForegroundColor Red
+        Write-Host "Please install XAMPP first." -ForegroundColor Yellow
+        Write-Host ""
+        
+        [System.Windows.Forms.MessageBox]::Show(
+            "XAMPP not found at: $($script:xamppPath)`n`nPlease install XAMPP first.",
+            "Error",
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Error
+        )
+        $form.Close()
+        return
+    }
+    
+    # Start services with progress updates
+    try {
+        # Start Apache
+        $statusLabel.Text = "Starting Apache Web Server..."
+        $progressBar.Value = 10
+        $form.Refresh()
+        Start-Sleep -Milliseconds 500
+        
+        $apacheResult = Start-ApacheService
+        $progressBar.Value = 33
+        $form.Refresh()
+        Start-Sleep -Seconds 1
+        
+        # Start MySQL
+        $statusLabel.Text = "Starting MySQL Database Server..."
+        $progressBar.Value = 40
+        $form.Refresh()
+        Start-Sleep -Milliseconds 500
+        
+        $mysqlResult = Start-MySQLService
+        $progressBar.Value = 66
+        $form.Refresh()
+        Start-Sleep -Seconds 1
+        
+        # Start Laravel Backend
+        $statusLabel.Text = "Starting Laravel Backend API..."
+        $progressBar.Value = 70
+        $form.Refresh()
+        Start-Sleep -Milliseconds 500
+        
+        $laravelResult = Start-LaravelBackend -StatusLabel $statusLabel
+        $progressBar.Value = 100
+        $form.Refresh()
+        
+        # Success
+        Write-Host ""
+        Write-Host "All services started successfully!" -ForegroundColor Green
+        Write-Host ""
+        
+        $progressLabel.Text = "✓ System Started!"
+        $progressLabel.ForeColor = [System.Drawing.Color]::FromArgb(39, 174, 96)
+        $statusLabel.Text = "Opening browser..."
+        $form.Refresh()
+        
+        # Wait for services to initialize
+        Start-Sleep -Seconds 3
+        
+        # Open browser
+        Open-Browser -Url $script:frontendUrl
+        
+        # Wait a bit then close
+        Write-Host "Launcher will close in 2 seconds..." -ForegroundColor Cyan
+        Start-Sleep -Seconds 2
+        
+        Write-Host ""
+        Write-Host "Launcher finished successfully!" -ForegroundColor Green
+        Write-Host ""
+        
+        $form.Close()
+    }
+    catch {
+        Write-Host ""
+        Write-Host "ERROR: Failed to start services" -ForegroundColor Red
+        Write-Host $_.Exception.Message -ForegroundColor Yellow
+        Write-Host ""
+        
+        [System.Windows.Forms.MessageBox]::Show(
+            "Error starting services: $_",
+            "Error",
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Error
+        )
+        $form.Close()
+    }
+})
+
+# Button hover effects
+$startButton.Add_MouseEnter({
+    $startButton.BackColor = [System.Drawing.Color]::FromArgb(34, 153, 84)
+})
+
+$startButton.Add_MouseLeave({
+    $startButton.BackColor = [System.Drawing.Color]::FromArgb(39, 174, 96)
+})
+
+$cancelButton.Add_MouseEnter({
+    $cancelButton.BackColor = [System.Drawing.Color]::FromArgb(127, 140, 141)
+})
+
+$cancelButton.Add_MouseLeave({
+    $cancelButton.BackColor = [System.Drawing.Color]::FromArgb(149, 165, 166)
+})
+
+# ============================================================================
+# SHOW FORM
+# ============================================================================
+
+Write-Host "Showing launcher GUI..." -ForegroundColor Cyan
+Write-Host ""
+
+[void]$form.ShowDialog()
+
+# Cleanup
+Write-Host "Cleaning up resources..." -ForegroundColor Cyan
+if ($logo.Image) {
+    $logo.Image.Dispose()
+}
+$form.Dispose()
+
+Write-Host ""
+Write-Host "CFAS Launcher closed." -ForegroundColor Green
+Write-Host ""

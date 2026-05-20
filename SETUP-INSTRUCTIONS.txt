@@ -1,0 +1,67 @@
+========================================
+  CFAS EXAM SYSTEM - SETUP GUIDE
+========================================
+
+STEP 1: INSTALL SERVICES (ONE TIME ONLY)
+-----------------------------------------
+1. Right-click: INSTALL-SERVICES.bat
+2. Select: "Run as Administrator"
+3. Press any key
+4. Wait for "INSTALLATION COMPLETE!"
+
+This installs Apache and MySQL as Windows Services
+so they run independently (won't die when you close terminal).
+
+
+STEP 2: CREATE DESKTOP SHORTCUTS (OPTIONAL)
+--------------------------------------------
+1. Double-click: create-desktop-shortcuts.vbs
+2. Click OK
+3. You'll see on Desktop:
+   - START Exam System
+   - STOP Exam System
+
+
+STEP 3: DAILY USE
+-----------------
+EVERY MORNING (Before Exam):
+  - Double-click: START Exam System (on Desktop)
+  - Wait for "SYSTEM READY!"
+  - Browser will open automatically
+  - CLOSE THE TERMINAL - Services will keep running!
+  - Share URL: http://192.168.11.40
+
+EVERY AFTERNOON (After Exam):
+  - Double-click: STOP Exam System (on Desktop)
+  - Done!
+
+
+TROUBLESHOOTING
+---------------
+Problem: "Apache: FAILED"
+Solution: Run INSTALL-SERVICES.bat as Administrator first
+
+Problem: Terminal closes but Apache dies
+Solution: You need to install services (Step 1)
+
+Problem: Can't access from other PCs
+Solution: Check firewall, make sure same network
+
+
+IMPORTANT NOTES
+---------------
+- Install services ONCE only (Step 1)
+- After installing services, you can close terminal safely
+- Services run in background independently
+- Use XAMPP Control Panel as alternative
+
+
+ACCESS INFORMATION
+------------------
+Main URL: http://192.168.11.40
+Admin: username "admin", password "admin123"
+
+
+========================================
+  ENJOY YOUR AUTOMATED EXAM SYSTEM!
+========================================

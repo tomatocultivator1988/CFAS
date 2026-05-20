@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environment Detection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .result {
+            background: #f0f0f0;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Environment Detection Test</h1>
+    <p>This page tests the environment detection and backend connectivity.</p>
+    
+    <button onclick="testEnvironment()">Test Environment Detection</button>
+    <button onclick="testBackendConnectivity()">Test Backend Connectivity</button>
+    <button onclick="testAnalyticsAPI()">Test Analytics API</button>
+    
+    <div id="results"></div>
+
+    <script type="module">
+        import EnvironmentDetector from './src/config/environmentDetector.js';
+        import ConfigManager from './src/config/configManager.js';
+
+        window.testEnvironment = async function() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="result">Testing environment detection...</div>';
+            
+            try {
+                // Clear cache to force fresh detection
+                EnvironmentDetector.clearCache();
+                ConfigManager.reset();
+                
+                const environment = await EnvironmentDetector.detectEnvironment();
+                const apiUrl = await ConfigManager.getApiUrl();
+                const basePath = await ConfigManager.getBasePath();
+                
+                resultsDiv.innerHTML = `
+                    <div class="result success">
+                        <h3>Environment Detection Results:</h3>
+                        <p><strong>Environment:</strong> ${environment}</p>
+                        <p><strong>API URL:</strong> ${apiUrl}</p>
+                        <p><strong>Base Path:</strong> ${basePath}</p>
+                        <p><strong>Expected:</strong> local environment with http://127.0.0.1:8000/api</p>
+                    </div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>Error:</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        };
+
+        window.testBackendConnectivity = async function() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="result">Testing backend connectivity...</div>';
+            
+            try {
+                const localBackend = 'http://127.0.0.1:8000/api/health';
+                const apacheBackend = 'http://192.168.11.40/api/health';
+                
+                const localResponse = await fetch(localBackend).catch(() => null);
+                const apacheResponse = await fetch(apacheBackend).catch(() => null);
+                
+                resultsDiv.innerHTML = `
+                    <div class="result">
+                        <h3>Backend Connectivity Results:</h3>
+                        <p><strong>Local Backend (127.0.0.1:8000):</strong> ${localResponse ? '✅ Available' : '❌ Not Available'}</p>
+                        <p><strong>Apache Backend (192.168.11.40):</strong> ${apacheResponse ? '✅ Available' : '❌ Not Available'}</p>
+                    </div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>Error:</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        };
+
+        window.testAnalyticsAPI = async function() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="result">Testing Analytics API...</div>';
+            
+            try {
+                const apiUrl = await ConfigManager.getApiUrl();
+                const analyticsUrl = `${apiUrl}/analytics/dashboard-summary?timeFilter=7days`;
+                
+                resultsDiv.innerHTML += `<div class="result">Fetching from: ${analyticsUrl}</div>`;
+                
+                const response = await fetch(analyticsUrl, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML = `
+                        <div class="result success">
+                            <h3>Analytics API Test Results:</h3>
+                            <p><strong>Status:</strong> ✅ Success</p>
+                            <p><strong>API URL:</strong> ${apiUrl}</p>
+                            <p><strong>Category Breakdown Count:</strong> ${data.categoryBreakdown?.length || 0}</p>
+                            <p><strong>Categories with attempts:</strong></p>
+                            <pre>${JSON.stringify(data.categoryBreakdown, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div class="result error">
+                            <h3>Analytics API Test Failed:</h3>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                            <p><strong>API URL:</strong> ${apiUrl}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>Error:</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        };
+    </script>
+</body>
+</html>

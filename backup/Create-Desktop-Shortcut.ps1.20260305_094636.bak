@@ -1,0 +1,66 @@
+# ============================================================================
+# Create Desktop Shortcut for CFAS Exam System Launcher
+# ============================================================================
+
+Write-Host "Creating CFAS Exam System Desktop Shortcut..." -ForegroundColor Cyan
+Write-Host ""
+
+# Get the current script directory (Exam-Main folder)
+$examMainPath = $PSScriptRoot
+
+# Get user's Desktop path
+$desktopPath = [Environment]::GetFolderPath("Desktop")
+
+# Shortcut details
+$shortcutName = "CFAS Exam System.lnk"
+$shortcutPath = Join-Path $desktopPath $shortcutName
+$launcherScript = Join-Path $examMainPath "CFAS-System-Launcher.ps1"
+
+# Validate launcher script exists
+if (-not (Test-Path $launcherScript)) {
+    Write-Host "ERROR: Launcher script not found at:" -ForegroundColor Red
+    Write-Host $launcherScript -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Please make sure CFAS-System-Launcher.ps1 exists in the Exam-Main folder." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Press any key to exit..." -ForegroundColor Gray
+    pause
+    exit 1
+}
+
+try {
+    # Create WScript Shell object
+    $WScriptShell = New-Object -ComObject WScript.Shell
+    
+    # Create shortcut
+    $shortcut = $WScriptShell.CreateShortcut($shortcutPath)
+    
+    # Set shortcut properties
+    $shortcut.TargetPath = "powershell.exe"
+    $shortcut.Arguments = "-ExecutionPolicy Bypass -NoProfile -File `"$launcherScript`""
+    $shortcut.WorkingDirectory = $examMainPath
+    $shortcut.Description = "Launch CFAS Exam System with all services"
+    $shortcut.IconLocation = "powershell.exe,0"
+    
+    # Save shortcut
+    $shortcut.Save()
+    
+    Write-Host "SUCCESS!" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Desktop shortcut created successfully!" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Shortcut Location: $shortcutPath" -ForegroundColor Cyan
+    Write-Host "Launcher Script: $launcherScript" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "You can now double-click the 'CFAS Exam System' icon on your desktop" -ForegroundColor Green
+    Write-Host "to launch the exam system with a professional GUI!" -ForegroundColor Green
+    Write-Host ""
+}
+catch {
+    Write-Host "ERROR: Failed to create desktop shortcut" -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Yellow
+    Write-Host ""
+}
+
+Write-Host "Press any key to exit..." -ForegroundColor Gray
+pause

@@ -1,0 +1,104 @@
+# Laravel Backend
+/backend/vendor/
+/backend/node_modules/
+/backend/.env
+/backend/.env.backup
+/backend/.phpunit.result.cache
+/backend/Homestead.json
+/backend/Homestead.yaml
+/backend/auth.json
+/backend/npm-debug.log
+/backend/yarn-error.log
+/backend/.idea
+/backend/.vscode
+/backend/storage/*.key
+/backend/storage/app/*
+!/backend/storage/app/.gitignore
+/backend/storage/framework/cache/*
+!/backend/storage/framework/cache/.gitignore
+/backend/storage/framework/sessions/*
+!/backend/storage/framework/sessions/.gitignore
+/backend/storage/framework/testing/*
+!/backend/storage/framework/testing/.gitignore
+/backend/storage/framework/views/*
+!/backend/storage/framework/views/.gitignore
+/backend/storage/logs/*
+!/backend/storage/logs/.gitignore
+
+# Vue.js Frontend
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.env
+/frontend/.env.local
+/frontend/.env.*.local
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+/frontend/pnpm-debug.log*
+
+# Editor directories and files
+.DS_Store
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Python ML Service
+__pycache__/
+*.py[cod]
+/ml-service/__pycache__/
+/ml-service/*.pyc
+/ml-service/.pytest_cache/
+/ml-service/venv/
+/ml-service/.env
+/ml-service/models/*.pkl
+/ml-service/models/*.joblib
+
+# ML Model
+/ml_model/__pycache__/
+/ml_model/*.pyc
+/ml_model/venv/
+/ml_model/models/*.pkl
+/ml_model/models/*.joblib
+
+# Composer
+/vendor/
+
+# Database files
+*.sql
+*.sqlite
+*.db
+
+# Large document files (optional - uncomment if you don't want to upload test files)
+# *.docx
+# *.pdf
+
+# Temporary test files
+test-output*.txt
+test-extracted*.txt
+capset_*_raw.txt
+capset_*_tables.txt
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Environment-specific files
+.env
+.env.hostinger
+.env.local
+backend/.env.hostinger
+frontend/.env.hostinger
+
+# Office temporary lock files
+~$*
+
+# Uploaded files (if you have an uploads directory)
+/backend/storage/app/uploads/*
+!/backend/storage/app/uploads/.gitignore
+
+# Logs
+*.log

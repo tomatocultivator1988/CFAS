@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Visibility Test</title>
+    <style>
+        /* Test if our ultra-visible modal CSS works */
+        .modal-overlay-ultra-debug {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(255, 0, 0, 0.9) !important;
+            z-index: 999999 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 20px !important;
+        }
+
+        .success-modal-ultra-debug {
+            background: #FFFF00 !important;
+            border: 10px solid #FF0000 !important;
+            border-radius: 24px !important;
+            padding: 48px 40px !important;
+            max-width: 480px !important;
+            width: 100% !important;
+            text-align: center !important;
+            position: relative !important;
+            z-index: 1000000 !important;
+        }
+
+        .success-modal-ultra-debug h2 {
+            font-size: 32px !important;
+            font-weight: 800 !important;
+            color: #FF0000 !important;
+            margin: 0 0 12px 0 !important;
+        }
+
+        .btn-test {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Modal Visibility Test</h1>
+    <p>This page tests if our ultra-visible modal CSS works correctly.</p>
+    
+    <button class="btn-test" onclick="showModal()">Show Ultra-Visible Modal</button>
+    <button class="btn-test" onclick="hideModal()">Hide Modal</button>
+    
+    <div id="testModal" class="modal-overlay-ultra-debug" style="display: none;">
+        <div class="success-modal-ultra-debug">
+            <h2>🎉 TEST MODAL 🎉</h2>
+            <p>If you can see this bright yellow modal with red border, the CSS is working!</p>
+            <button class="btn-test" onclick="hideModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        function showModal() {
+            console.log('🔧 TEST: Showing modal...');
+            const modal = document.getElementById('testModal');
+            modal.style.display = 'flex';
+            console.log('🔧 TEST: Modal display set to flex');
+            console.log('🔧 TEST: Modal element:', modal);
+            console.log('🔧 TEST: Modal computed styles:', window.getComputedStyle(modal));
+        }
+
+        function hideModal() {
+            console.log('🔧 TEST: Hiding modal...');
+            const modal = document.getElementById('testModal');
+            modal.style.display = 'none';
+        }
+
+        // Auto-show modal after 2 seconds for testing
+        setTimeout(() => {
+            console.log('🔧 TEST: Auto-showing modal in 2 seconds...');
+            showModal();
+        }, 2000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║           CFAS REVIEW CENTER EXAMINATION SYSTEM               ║
+║                     ACCESS INFORMATION                        ║
+║                                                               ║
+╠═══════════════════════════════════════════════════════════════╣
+║                                                               ║
+║  HOW TO ACCESS:                                               ║
+║                                                               ║
+║  1. Connect to the WiFi network                               ║
+║                                                               ║
+║  2. Open any web browser                                      ║
+║     (Chrome, Firefox, Edge, Safari, etc.)                     ║
+║                                                               ║
+║  3. Type this address in the address bar:                     ║
+║                                                               ║
+║     ┌─────────────────────────────────────────┐              ║
+║     │  http://192.168.11.40                   │              ║
+║     └─────────────────────────────────────────┘              ║
+║                                                               ║
+║  4. Press Enter                                               ║
+║                                                               ║
+║  5. Login with your username and password                     ║
+║                                                               ║
+╠═══════════════════════════════════════════════════════════════╣
+║                                                               ║
+║  IMPORTANT NOTES:                                             ║
+║                                                               ║
+║  • Make sure you're connected to the correct WiFi             ║
+║  • Your device IP should start with 192.168.11.x              ║
+║  • If page doesn't load, try adding /exam-frontend/           ║
+║  • Contact administrator if you have problems                 ║
+║                                                               ║
+╠═══════════════════════════════════════════════════════════════╣
+║                                                               ║
+║  TROUBLESHOOTING:                                             ║
+║                                                               ║
+║  Problem: "Can't reach this page"                             ║
+║  Solution: Check WiFi connection, ask administrator           ║
+║                                                               ║
+║  Problem: Login doesn't work                                  ║
+║  Solution: Check username/password, contact administrator     ║
+║                                                               ║
+║  Problem: Page loads slowly                                   ║
+║  Solution: Wait a moment, refresh page (F5)                   ║
+║                                                               ║
+╠═══════════════════════════════════════════════════════════════╣
+║                                                               ║
+║  EXAM RULES:                                                  ║
+║                                                               ║
+║  • Do not close the browser during exam                       ║
+║  • Do not switch tabs or windows                              ║
+║  • Do not refresh the page unnecessarily                      ║
+║  • Submit your answers before time runs out                   ║
+║  • Follow all instructions from the administrator             ║
+║                                                               ║
+╠═══════════════════════════════════════════════════════════════╣
+║                                                               ║
+║  NEED HELP?                                                   ║
+║                                                               ║
+║  Raise your hand and wait for the administrator               ║
+║  Do not disturb other examinees                               ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+
+═══════════════════════════════════════════════════════════════
+
+                    QUICK REFERENCE CARD
+                    
+═══════════════════════════════════════════════════════════════
+
+    EXAM SYSTEM URL:  http://192.168.11.40
+    
+    STEPS:
+    1. Connect to WiFi
+    2. Open browser
+    3. Go to URL above
+    4. Login
+    
+═══════════════════════════════════════════════════════════════

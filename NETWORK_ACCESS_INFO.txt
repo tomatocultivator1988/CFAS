@@ -1,0 +1,16 @@
+CFAS Exam System - Network Access
+=====================================
+
+Server IP: 192.168.11.40
+
+Access URL: http://192.168.11.40/exam-frontend
+
+Student Login:
+- Username: reviewee
+- Password: password
+
+Admin Login:
+- Username: admin
+- Password: admin123
+
+Setup Date: 10/02/2026 10:15:14.46

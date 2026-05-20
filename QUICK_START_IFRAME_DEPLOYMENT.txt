@@ -1,0 +1,109 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║   ML IFRAME DASHBOARD - QUICK START GUIDE                    ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+📋 CURRENT STATUS:
+   ✅ Code is READY
+   ✅ Router is CONFIGURED
+   ✅ Deployment script is READY
+   ⏳ NOT YET DEPLOYED (waiting for you to run script)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 DEPLOYMENT STEPS (2-3 minutes):
+
+1️⃣  VERIFY READY
+   cd C:\Users\Hi\Desktop\CFAS REVIEW CENTER EXAMINATION SYSTEM\Exam-Main
+   .\verify-iframe-ready.ps1
+
+2️⃣  DEPLOY TO XAMPP
+   .\DEPLOY-ML-IFRAME-DASHBOARD.bat
+   
+   ⚠️  IMPORTANTE: Use DEPLOY-ML-IFRAME-DASHBOARD.bat
+                   NOT DEPLOY-ML-ANALYTICS-ENHANCEMENT.bat
+
+3️⃣  START PYTHON API
+   cd C:\Users\Hi\Desktop\review-center-ml-system-master
+   python dashboard_server.py
+   
+   Wait for: "Running on http://127.0.0.1:5000"
+
+4️⃣  OPEN BROWSER
+   http://192.168.11.40/admin/ml-predictions
+
+5️⃣  HARD REFRESH
+   Press: Ctrl + Shift + R
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ WHAT YOU'LL SEE:
+
+BEFORE (Current):                AFTER (New):
+┌─────────────────┐             ┌─────────────────┐
+│ ML Predictions  │             │ 🎨 ML Predictions│
+│                 │             │ & Analytics      │
+│ [Stats Cards]   │             │ [🔄 Refresh]     │
+│                 │             │                  │
+│ [Analyze Button]│    ═══>     │ ╔══════════════╗ │
+│ ← OLD VERSION   │             │ ║ FULL         ║ │
+│                 │             │ ║ PROFESSIONAL ║ │
+│ [Student Cards] │             │ ║ DASHBOARD    ║ │
+│                 │             │ ║ FROM         ║ │
+└─────────────────┘             │ ║ localhost:5000║ │
+                                │ ╚══════════════╝ │
+                                └─────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 TROUBLESHOOTING:
+
+❌ "Wala gihapon nag-change!"
+   → Hard refresh: Ctrl + Shift + R
+   → Verify you ran DEPLOY-ML-IFRAME-DASHBOARD.bat
+
+❌ "ML Analytics API Not Running" banner
+   → Start Python: python dashboard_server.py
+
+❌ "Loading spinner stuck"
+   → Check if localhost:5000 works directly
+   → Restart Python API
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 DOCUMENTATION:
+
+   📄 IFRAME_DEPLOYMENT_INSTRUCTIONS.md
+      → Hiligaynon/English deployment guide
+
+   📄 ML_IFRAME_DEPLOYMENT_READY.md
+      → Comprehensive technical guide
+
+   📄 BEFORE_AFTER_COMPARISON.md
+      → Visual comparison of old vs new
+
+   📄 TASK_11_IFRAME_COMPLETE.md
+      → Complete task summary
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 KEY POINTS:
+
+   ✓ Code is READY, just needs deployment
+   ✓ Takes only 2-3 minutes to deploy
+   ✓ Python API must be running at localhost:5000
+   ✓ Can easily revert if needed (low risk)
+   ✓ Professional dashboard will be embedded
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 READY TO DEPLOY?
+
+   Just run: .\DEPLOY-ML-IFRAME-DASHBOARD.bat
+
+   Boss, ready na! Dali lang ni, 2-3 minutes lang! 🚀
+
+╔═══════════════════════════════════════════════════════════════╗
+║  Need help? Check the documentation files above! 📚          ║
+╚═══════════════════════════════════════════════════════════════╝

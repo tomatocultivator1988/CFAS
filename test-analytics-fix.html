@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard Fix Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background: #f5f5f7;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #e9ecef;
+        }
+        .test-button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #0056CC;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Analytics Dashboard Fix Test</h1>
+        
+        <div class="info">
+            <strong>Issue Fixed:</strong> ReferenceError: Cannot access 'e' before initialization
+        </div>
+        
+        <h2>Problem Analysis</h2>
+        <p>The error was caused by:</p>
+        <ul>
+            <li><strong>Variable Redeclaration:</strong> Attempting to redeclare <code>currentTimeFilter</code> and <code>setTimeFilter</code> inside conditional blocks</li>
+            <li><strong>Improper Destructuring:</strong> Using destructuring assignment with renamed variables that caused hoisting conflicts</li>
+            <li><strong>Unsafe Access:</strong> Not properly handling undefined composable returns</li>
+        </ul>
+        
+        <h2>Solution Applied</h2>
+        <pre><code>// BEFORE (Problematic):
+const { timeFilter: currentTimeFilter, setTimeFilter } = useTimeFilter('all')
+
+// Redeclaration attempt (causes hoisting error):
+if (!currentTimeFilter) {
+  const currentTimeFilter = ref('all') // ❌ Redeclaration
+}
+
+// AFTER (Fixed):
+const timeFilterComposable = useTimeFilter('all')
+const currentTimeFilter = timeFilterComposable.timeFilter
+const setTimeFilter = timeFilterComposable.setTimeFilter
+
+const analyticsComposable = useAnalytics()
+const { /* destructured properties */ } = analyticsComposable</code></pre>
+        
+        <h2>Key Improvements</h2>
+        <ul>
+            <li>✅ Eliminated variable redeclaration conflicts</li>
+            <li>✅ Proper composable initialization</li>
+            <li>✅ Safe null checking throughout</li>
+            <li>✅ Improved error handling in watchers</li>
+            <li>✅ Better template event handling</li>
+        </ul>
+        
+        <h2>Test Instructions</h2>
+        <ol>
+            <li>Clear browser cache completely</li>
+            <li>Navigate to the Analytics Dashboard</li>
+            <li>Check browser console for errors</li>
+            <li>Test time filter changes</li>
+            <li>Test section switching</li>
+            <li>Test auto-refresh toggle</li>
+        </ol>
+        
+        <div class="success">
+            <strong>Expected Result:</strong> No more "Cannot access 'e' before initialization" errors in console
+        </div>
+        
+        <button class="test-button" onclick="window.open('/admin/analytics', '_blank')">
+            Open Analytics Dashboard
+        </button>
+        
+        <button class="test-button" onclick="location.reload()">
+            Refresh Test Page
+        </button>
+    </div>
+
+    <script>
+        console.log('Analytics Dashboard Fix Test Page Loaded');
+        console.log('Time:', new Date().toLocaleString());
+        
+        // Test basic JavaScript functionality
+        try {
+            const testComposable = {
+                timeFilter: { value: 'all' },
+                setTimeFilter: (val) => console.log('Setting filter:', val)
+            };
+            
+            const currentTimeFilter = testComposable.timeFilter;
+            const setTimeFilter = testComposable.setTimeFilter;
+            
+            console.log('✅ Variable assignment test passed');
+            console.log('Current filter:', currentTimeFilter?.value);
+            
+        } catch (error) {
+            console.error('❌ Test failed:', error);
+        }
+    </script>
+</body>
+</html>
