@@ -30,6 +30,7 @@ class ExportController extends Controller
 
             $examsQuery = DB::table('exams')
                 ->select('id', 'title', 'category')
+                ->where('is_deleted', 0)
                 ->orderBy('category')
                 ->orderBy('title');
 
@@ -111,6 +112,7 @@ class ExportController extends Controller
                 ->join('users', 'exam_attempts.reviewee_id', '=', 'users.id')
                 ->join('exams', 'exam_attempts.exam_id', '=', 'exams.id')
                 ->where('exam_attempts.status', 'completed')
+                ->where('exams.is_deleted', 0)
                 ->select(
                     'exam_attempts.id as attempt_id',
                     'users.id as user_id',
@@ -271,6 +273,7 @@ class ExportController extends Controller
         try {
             $categories = DB::table('exams')
                 ->select('category')
+                ->where('is_deleted', 0)
                 ->distinct()
                 ->orderBy('category')
                 ->pluck('category')
@@ -279,6 +282,7 @@ class ExportController extends Controller
 
             $examsByCategory = DB::table('exams')
                 ->select('id', 'title', 'category')
+                ->where('is_deleted', 0)
                 ->orderBy('category')
                 ->orderBy('title')
                 ->get()
@@ -423,6 +427,7 @@ class ExportController extends Controller
 
             $examsByCategory = DB::table('exams')
                 ->select('id', 'title', 'category', 'total_questions')
+                ->where('is_deleted', 0)
                 ->orderBy('category')
                 ->orderBy('title')
                 ->get()
@@ -430,6 +435,7 @@ class ExportController extends Controller
 
             $categories = DB::table('exams')
                 ->select('category')
+                ->where('is_deleted', 0)
                 ->distinct()
                 ->orderBy('category')
                 ->pluck('category')
@@ -596,7 +602,7 @@ class ExportController extends Controller
             $exportData[] = ['Active Students', $activeStudents];
             $exportData[] = ['Inactive Students', $totalStudents - $activeStudents];
             $exportData[] = ['Total Categories', count($categories)];
-            $exportData[] = ['Total Exams', DB::table('exams')->count()];
+            $exportData[] = ['Total Exams', DB::table('exams')->where('is_deleted', 0)->count()];
             $exportData[] = ['Passing Threshold', '90%'];
 
             return response()->json([
@@ -668,16 +674,25 @@ class ExportController extends Controller
     private function getAttemptBucketsByStudentExam(array $examIds = [], array $studentIds = []): array
     {
         $attemptsQuery = DB::table('exam_attempts')
-            ->where('status', 'completed')
-            ->select('id', 'reviewee_id', 'exam_id', 'score', 'total_questions', 'start_time')
-            ->orderBy('start_time');
+            ->join('exams', 'exam_attempts.exam_id', '=', 'exams.id')
+            ->where('exam_attempts.status', 'completed')
+            ->where('exams.is_deleted', 0)
+            ->select(
+                'exam_attempts.id',
+                'exam_attempts.reviewee_id',
+                'exam_attempts.exam_id',
+                'exam_attempts.score',
+                'exam_attempts.total_questions',
+                'exam_attempts.start_time'
+            )
+            ->orderBy('exam_attempts.start_time');
 
         if (!empty($examIds)) {
-            $attemptsQuery->whereIn('exam_id', $examIds);
+            $attemptsQuery->whereIn('exam_attempts.exam_id', $examIds);
         }
 
         if (!empty($studentIds)) {
-            $attemptsQuery->whereIn('reviewee_id', $studentIds);
+            $attemptsQuery->whereIn('exam_attempts.reviewee_id', $studentIds);
         }
 
         $attempts = $attemptsQuery->get();
