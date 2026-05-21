@@ -273,6 +273,24 @@ export const useAdminStore = defineStore('admin', () => {
       return { success: false, error: err.response?.data?.message || 'Failed to get audit log' }
     }
   }
+
+  const sendScoreSummary = async (userId) => {
+    try {
+      const response = await api.post(`/admin/users/${userId}/send-score-summary`)
+      return { success: true, data: response.data }
+    } catch (err) {
+      return { success: false, error: err.response?.data?.message || 'Failed to send score summary' }
+    }
+  }
+
+  const sendScoreSummaryBulk = async (payload) => {
+    try {
+      const response = await api.post('/admin/users/send-score-summary-bulk', payload)
+      return { success: true, data: response.data }
+    } catch (err) {
+      return { success: false, error: err.response?.data?.message || 'Failed to send score summaries' }
+    }
+  }
   
   // Analytics
   const getRevieweeScores = async (revieweeId) => {
@@ -350,6 +368,8 @@ export const useAdminStore = defineStore('admin', () => {
     permanentlyDeleteUser,
     resetPassword,
     getUserAuditLog,
+    sendScoreSummary,
+    sendScoreSummaryBulk,
     // Analytics methods
     getRevieweeScores,
     getExamAverage,

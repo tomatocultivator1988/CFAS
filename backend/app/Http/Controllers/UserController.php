@@ -4,16 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Services\ScoreSummaryEmailService;
 use App\Services\UserManagementService;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
     protected UserManagementService $userService;
+    protected ScoreSummaryEmailService $scoreSummaryEmailService;
 
-    public function __construct(UserManagementService $userService)
+    public function __construct(UserManagementService $userService, ScoreSummaryEmailService $scoreSummaryEmailService)
     {
         $this->userService = $userService;
+        $this->scoreSummaryEmailService = $scoreSummaryEmailService;
     }
 
     /**
@@ -63,6 +66,7 @@ class UserController extends Controller
     {
         $request->validate([
             'username' => 'required|string|min:3|max:50|unique:users,username',
+            'email' => 'required|email|max:255|unique:users,email',
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
             'middle_initial' => 'nullable|string|max:10',
@@ -95,6 +99,7 @@ class UserController extends Controller
     {
         $request->validate([
             'username' => 'string|min:3|max:50',
+            'email' => 'nullable|email|max:255|unique:users,email,' . $id,
             'first_name' => 'string|max:100',
             'last_name' => 'string|max:100',
             'middle_initial' => 'nullable|string|max:10',
@@ -212,5 +217,62 @@ class UserController extends Controller
                 'message' => $e->getMessage()
             ], 400);
         }
+    }
+
+    public function sendScoreSummary(Request $request, int $id): JsonResponse
+    {
+        try {
+            $result = $this->scoreSummaryEmailService->sendSingle($id, (int) $request->user()->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Score summary sent successfully.',
+                'data' => [
+                    'reviewee_id' => $result['reviewee_id'],
+                    'email' => $result['email'],
+                ],
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Active reviewee was not found.',
+            ], 404);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        } catch (\Throwable $e) {
+            \Log::error('Send score summary failed', [
+                'reviewee_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send score summary. Please check SMTP settings.',
+            ], 500);
+        }
+    }
+
+    public function sendScoreSummaryBulk(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'user_ids' => 'nullable|array',
+            'user_ids.*' => 'integer|exists:users,id',
+            'search' => 'nullable|string|max:100',
+        ]);
+
+        $result = $this->scoreSummaryEmailService->sendBulk(
+            $validated['user_ids'] ?? [],
+            $validated['search'] ?? null,
+            (int) $request->user()->id
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Bulk score summary send completed.',
+            'data' => $result,
+        ], 200);
     }
 }

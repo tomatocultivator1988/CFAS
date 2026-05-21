@@ -34,6 +34,7 @@ class UserManagementService
             // Create user with default password
             $user = User::create([
                 'username' => $data['username'],
+                'email' => $this->normalizeEmail($data['email'] ?? null),
                 'password_hash' => Hash::make(self::DEFAULT_PASSWORD),
                 'first_name' => $data['first_name'] ?? null,
                 'last_name' => $data['last_name'] ?? null,
@@ -46,6 +47,7 @@ class UserManagementService
             // Log the action
             $this->logUserAction($adminId, 'user_created', $user->id, [
                 'username' => $user->username,
+                'email' => $user->email,
                 'role' => $user->role,
             ]);
 
@@ -85,6 +87,12 @@ class UserManagementService
             if (isset($data['username'])) {
                 $changes['username'] = ['old' => $user->username, 'new' => $data['username']];
                 $user->username = $data['username'];
+            }
+
+            if (array_key_exists('email', $data)) {
+                $email = $this->normalizeEmail($data['email'] ?? null);
+                $changes['email'] = ['old' => $user->email, 'new' => $email];
+                $user->email = $email;
             }
 
             if (isset($data['first_name'])) {
@@ -348,5 +356,12 @@ class UserManagementService
             'ip_address' => request()->ip(),
             'created_at' => now(),
         ]);
+    }
+
+    private function normalizeEmail(?string $email): ?string
+    {
+        $email = trim((string) $email);
+
+        return $email === '' ? null : strtolower($email);
     }
 }

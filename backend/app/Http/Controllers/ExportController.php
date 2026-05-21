@@ -288,10 +288,15 @@ class ExportController extends Controller
                 ->get()
                 ->groupBy('category');
 
+            $studentSelect = ['id', 'username', 'first_name', 'last_name'];
+            if (Schema::hasColumn('users', 'email')) {
+                $studentSelect[] = 'email';
+            }
+
             $students = DB::table('users')
                 ->where('role', 'reviewee')
                 ->where('is_active', true)
-                ->select('id', 'username', 'first_name', 'last_name')
+                ->select($studentSelect)
                 ->orderBy('username')
                 ->get();
 
@@ -325,6 +330,7 @@ class ExportController extends Controller
                             $examData['students'][] = [
                                 'student_id' => $student->id,
                                 'username' => $student->username,
+                                'email' => $student->email ?? null,
                                 'name' => $studentName,
                                 'status' => 'Not Taken',
                                 'attempts' => []
@@ -356,6 +362,7 @@ class ExportController extends Controller
                             $examData['students'][] = [
                                 'student_id' => $student->id,
                                 'username' => $student->username,
+                                'email' => $student->email ?? null,
                                 'name' => $studentName,
                                 'status' => $status,
                                 'best_percentage' => $summary['bestPercentage'],

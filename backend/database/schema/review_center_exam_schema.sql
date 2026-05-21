@@ -353,6 +353,7 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
   `first_name` varchar(100) DEFAULT NULL,
   `last_name` varchar(100) DEFAULT NULL,
   `middle_initial` varchar(10) DEFAULT NULL,
@@ -364,6 +365,7 @@ CREATE TABLE `users` (
   `last_login_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_username_unique` (`username`),
+  UNIQUE KEY `users_email_unique` (`email`),
   KEY `users_username_index` (`username`),
   KEY `users_role_index` (`role`),
   KEY `users_role_is_active_id_index` (`role`,`is_active`,`id`),

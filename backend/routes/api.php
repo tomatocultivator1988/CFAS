@@ -82,12 +82,14 @@ Route::middleware(['auth.token', 'log.api', 'sanitize'])->group(function () {
         
         // User management
         Route::get('/users', [UserController::class, 'index']);
-        Route::get('/users/{id}', [UserController::class, 'show']);
         Route::post('/users', [UserController::class, 'store']);
+        Route::post('/users/send-score-summary-bulk', [UserController::class, 'sendScoreSummaryBulk']);
+        Route::get('/users/{id}', [UserController::class, 'show']);
         Route::put('/users/{id}', [UserController::class, 'update']);
         Route::delete('/users/{id}', [UserController::class, 'destroy']);
         Route::delete('/users/{id}/permanent', [UserController::class, 'permanentlyDelete']);
         Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword']);
+        Route::post('/users/{id}/send-score-summary', [UserController::class, 'sendScoreSummary']);
         Route::get('/users/{id}/audit-log', [UserController::class, 'auditLog']);
         
         // Export routes

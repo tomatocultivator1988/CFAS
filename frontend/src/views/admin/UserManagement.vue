@@ -81,6 +81,7 @@
           <div class="user-name-section">
             <h3 class="user-card-name">{{ getUserFullName(user) }}</h3>
             <p class="user-card-username">@{{ user.username }}</p>
+            <p class="user-card-email" :class="{ missing: !user.email }">{{ user.email || 'No email set' }}</p>
           </div>
         </div>
 
@@ -365,6 +366,7 @@ const filteredUsers = computed(() => {
       const fullName = getUserFullName(u).toLowerCase()
       return (
         u.username?.toLowerCase().includes(query) ||
+        u.email?.toLowerCase().includes(query) ||
         u.first_name?.toLowerCase().includes(query) ||
         u.last_name?.toLowerCase().includes(query) ||
         fullName.includes(query)
@@ -888,6 +890,21 @@ const handleSave = async () => {
   font-weight: 400;
   letter-spacing: -0.1px;
   line-height: 1.3;
+}
+
+.user-card-email {
+  font-size: 12px;
+  color: #4B5563;
+  margin: 4px 0 0;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-card-email.missing {
+  color: #D97706;
 }
 
 /* Row 2: Badges and Actions */

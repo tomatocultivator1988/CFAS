@@ -38,6 +38,16 @@
         </div>
 
         <div class="form-group">
+          <label>Email</label>
+          <input
+            v-model="formData.email"
+            type="email"
+            :required="!user"
+            placeholder="Enter email address"
+          />
+        </div>
+
+        <div class="form-group">
           <label>Role</label>
           <select v-model="formData.role" required>
             <option value="reviewee">Reviewee</option>
@@ -93,6 +103,7 @@ const formData = reactive({
   last_name: props.user?.last_name || '',
   middle_initial: props.user?.middle_initial || '',
   username: props.user?.username || '',
+  email: props.user?.email || '',
   role: props.user?.role || 'reviewee',
   is_active: props.user?.is_active !== false
 })
@@ -104,8 +115,17 @@ watch(() => props.user, (newUser) => {
     formData.last_name = newUser.last_name || ''
     formData.middle_initial = newUser.middle_initial || ''
     formData.username = newUser.username || ''
+    formData.email = newUser.email || ''
     formData.role = newUser.role || 'reviewee'
     formData.is_active = newUser.is_active !== false
+  } else {
+    formData.first_name = ''
+    formData.last_name = ''
+    formData.middle_initial = ''
+    formData.username = ''
+    formData.email = ''
+    formData.role = 'reviewee'
+    formData.is_active = true
   }
 }, { immediate: true })
 
@@ -245,6 +265,7 @@ form {
 
 .form-group input[type="text"],
 .form-group input[type="password"],
+.form-group input[type="email"],
 .form-group select {
   width: 100%;
   padding: 12px 14px;
