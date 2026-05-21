@@ -230,6 +230,7 @@ class UserController extends Controller
                 'data' => [
                     'reviewee_id' => $result['reviewee_id'],
                     'email' => $result['email'],
+                    'attachment' => $result['attachment'] ?? null,
                 ],
             ], 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -263,11 +264,27 @@ class UserController extends Controller
             'search' => 'nullable|string|max:100',
         ]);
 
-        $result = $this->scoreSummaryEmailService->sendBulk(
-            $validated['user_ids'] ?? [],
-            $validated['search'] ?? null,
-            (int) $request->user()->id
-        );
+        try {
+            $result = $this->scoreSummaryEmailService->sendBulk(
+                $validated['user_ids'] ?? [],
+                $validated['search'] ?? null,
+                (int) $request->user()->id
+            );
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        } catch (\Throwable $e) {
+            \Log::error('Bulk send score summary failed', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send score summaries. Please check SMTP settings.',
+            ], 500);
+        }
 
         return response()->json([
             'success' => true,

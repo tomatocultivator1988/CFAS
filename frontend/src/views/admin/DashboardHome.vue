@@ -315,6 +315,14 @@ const actions = [
     iconBg: 'linear-gradient(135deg, #F5F5F7 0%, #E8E8ED 100%)',
     iconViewBox: '0 0 24 24',
     iconPath: 'M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+  },
+  {
+    title: 'Email Scores',
+    description: 'Send Gmail score summaries to reviewees',
+    route: '/admin/score-emails',
+    iconBg: 'linear-gradient(135deg, #F5F5F7 0%, #E8E8ED 100%)',
+    iconViewBox: '0 0 24 24',
+    iconPath: 'M4 4h16v16H4z M4 7l8 6 8-6'
   }
 ]
 

@@ -26,6 +26,11 @@ const router = createRouter({
           component: () => import('@/views/ExamListView.vue')
         },
         {
+          path: 'email',
+          name: 'reviewee-email-settings',
+          component: () => import('@/views/RevieweeEmailSettingsView.vue')
+        },
+        {
           path: ':id/results',
           name: 'exam-results',
           component: () => import('@/views/ExamResultsView.vue')
@@ -82,6 +87,11 @@ const router = createRouter({
           path: 'exports',
           name: 'admin-exports',
           component: () => import('@/views/admin/ExportReports.vue')
+        },
+        {
+          path: 'score-emails',
+          name: 'admin-score-emails',
+          component: () => import('@/views/admin/EmailScoreSummaries.vue')
         },
         {
           path: 'scores',

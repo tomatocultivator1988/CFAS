@@ -74,6 +74,14 @@
           </svg>
           <span>Export Reports</span>
         </router-link>
+
+        <router-link to="/admin/score-emails" class="nav-item" active-class="active">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M4 4h16v16H4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            <path d="M4 7l8 6 8-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          </svg>
+          <span>Email Scores</span>
+        </router-link>
       </nav>
       
       <div class="sidebar-footer">
@@ -210,6 +218,7 @@ const currentPageTitle = computed(() => {
   if (path.includes('/ml-predictive')) return 'ML Predictive'
   if (path.includes('/analytics')) return 'Analytics'
   if (path.includes('/exports')) return 'Export Reports'
+  if (path.includes('/score-emails')) return 'Email Score Summaries'
   return 'Dashboard'
 })
 
@@ -248,6 +257,13 @@ const currentPageIcon = computed(() => {
     return {
       viewBox: '0 0 24 24',
       path: 'M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+    }
+  }
+
+  if (path.includes('/score-emails')) {
+    return {
+      viewBox: '0 0 24 24',
+      path: 'M4 4h16v16H4z M4 7l8 6 8-6'
     }
   }
   

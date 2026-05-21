@@ -85,6 +85,7 @@ class AuthController extends Controller
             'user' => [
                 'id' => $user->id,
                 'username' => $user->username,
+                'email' => $user->email,
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
                 'role' => $user->role,
@@ -135,6 +136,52 @@ class AuthController extends Controller
             'user' => [
                 'id' => $user->id,
                 'username' => $user->username,
+                'email' => $user->email,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'role' => $user->role,
+                'is_active' => $user->is_active,
+                'require_password_change' => $user->require_password_change,
+                'last_login_at' => $user->last_login_at,
+                'created_at' => $user->created_at,
+            ]
+        ], 200);
+    }
+
+    /**
+     * Update the current user's email address.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function updateEmail(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $email = trim((string) $request->input('email', ''));
+        $normalizedEmail = $email === '' ? null : strtolower($email);
+
+        $validator = Validator::make(['email' => $normalizedEmail], [
+            'email' => 'nullable|email|max:255|unique:users,email,' . $user->id,
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user->email = $normalizedEmail;
+        $user->save();
+
+        return response()->json([
+            'message' => $normalizedEmail ? 'Email address saved successfully.' : 'Email address removed successfully.',
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'email' => $user->email,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
                 'role' => $user->role,
                 'is_active' => $user->is_active,
                 'require_password_change' => $user->require_password_change,

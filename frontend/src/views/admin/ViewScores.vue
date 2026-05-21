@@ -31,19 +31,6 @@
           class="filter-input"
         />
       </div>
-      <div class="filter-actions">
-        <button
-          @click="openBulkSendConfirm"
-          class="btn-send-bulk"
-          :disabled="sendingBulk || filteredStudentData.length === 0"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M4 4h16v16H4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-            <path d="M4 7l8 6 8-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-          </svg>
-          <span>{{ sendingBulk ? 'Sending...' : 'Send Summaries' }}</span>
-        </button>
-      </div>
     </div>
 
     <!-- Loading State -->
@@ -112,25 +99,11 @@
                   <p class="details-subtitle">@{{ selectedStudent?.username }} | {{ selectedStudent?.email || 'No email set' }}</p>
                 </div>
               </div>
-              <div class="details-actions">
-                <button
-                  @click="sendSelectedSummary"
-                  class="btn-send-summary"
-                  :disabled="sendingStudentId === selectedStudent?.student_id || !selectedStudent?.email"
-                  :title="selectedStudent?.email ? 'Send score summary' : 'Add an email before sending'"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M4 4h16v16H4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                    <path d="M4 7l8 6 8-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                  </svg>
-                  <span>{{ sendingStudentId === selectedStudent?.student_id ? 'Sending...' : 'Send Summary' }}</span>
-                </button>
-                <button @click="closeStudentModal" class="btn-close-review">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                  </svg>
-                </button>
-              </div>
+              <button @click="closeStudentModal" class="btn-close-review">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                </svg>
+              </button>
             </div>
             
             <div class="details-summary">
@@ -333,43 +306,6 @@
       </div>
     </transition>
 
-    <transition name="modal-fade">
-      <div v-if="showBulkConfirm" class="modal-overlay-review">
-        <transition name="modal-scale">
-          <div v-if="showBulkConfirm" class="send-confirm-modal">
-            <div class="send-confirm-header">
-              <div>
-                <h3>Send Score Summaries?</h3>
-                <p>This will email {{ filteredStudentData.length }} filtered reviewee{{ filteredStudentData.length === 1 ? '' : 's' }}.</p>
-              </div>
-              <button @click="showBulkConfirm = false" class="btn-close-review">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-                </svg>
-              </button>
-            </div>
-            <div class="send-confirm-actions">
-              <button @click="showBulkConfirm = false" class="btn-cancel-send" :disabled="sendingBulk">Cancel</button>
-              <button @click="confirmBulkSend" class="btn-confirm-send" :disabled="sendingBulk">
-                {{ sendingBulk ? 'Sending...' : 'Send Emails' }}
-              </button>
-            </div>
-          </div>
-        </transition>
-      </div>
-    </transition>
-
-    <transition name="notification-slide">
-      <div v-if="sendNotice.show" class="send-notification" :class="sendNotice.type">
-        <div class="send-notification-title">{{ sendNotice.title }}</div>
-        <div class="send-notification-message">{{ sendNotice.message }}</div>
-        <button @click="sendNotice.show = false" class="send-notification-close">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-          </svg>
-        </button>
-      </div>
-    </transition>
   </div>
 </template>
 
@@ -388,15 +324,6 @@ const showStudentModal = ref(false)
 const showCategoryModal = ref(false)
 const showReviewModal = ref(false)
 const reviewData = ref(null)
-const sendingStudentId = ref(null)
-const sendingBulk = ref(false)
-const showBulkConfirm = ref(false)
-const sendNotice = ref({
-  show: false,
-  type: 'success',
-  title: '',
-  message: ''
-})
 
 // Filter students based on search
 const filteredStudentData = computed(() => {
@@ -597,60 +524,6 @@ const closeReviewModal = () => {
   reviewData.value = null
 }
 
-const showSendNotice = (type, title, message) => {
-  sendNotice.value = { show: true, type, title, message }
-  window.setTimeout(() => {
-    sendNotice.value.show = false
-  }, 6000)
-}
-
-const sendSelectedSummary = async () => {
-  if (!selectedStudent.value || !selectedStudent.value.email) {
-    showSendNotice('error', 'Email Required', 'Add an email address for this student before sending.')
-    return
-  }
-
-  sendingStudentId.value = selectedStudent.value.student_id
-  try {
-    const response = await api.post(`/admin/users/${selectedStudent.value.student_id}/send-score-summary`)
-    showSendNotice('success', 'Summary Sent', response.data?.message || `Sent to ${selectedStudent.value.email}.`)
-  } catch (error) {
-    showSendNotice('error', 'Send Failed', error.response?.data?.message || 'Failed to send score summary.')
-  } finally {
-    sendingStudentId.value = null
-  }
-}
-
-const openBulkSendConfirm = () => {
-  if (filteredStudentData.value.length === 0) return
-  showBulkConfirm.value = true
-}
-
-const confirmBulkSend = async () => {
-  sendingBulk.value = true
-  try {
-    const userIds = filteredStudentData.value.map(student => student.student_id)
-    const response = await api.post('/admin/users/send-score-summary-bulk', {
-      user_ids: userIds,
-      search: searchStudent.value || null
-    })
-    const result = response.data?.data || {}
-    const message = [
-      `${result.sent || 0} sent`,
-      `${result.skipped_no_email || 0} no email`,
-      `${result.skipped_no_scores || 0} no scores`,
-      `${result.failed || 0} failed`
-    ].join(' | ')
-
-    showBulkConfirm.value = false
-    showSendNotice((result.failed || 0) > 0 ? 'error' : 'success', 'Bulk Send Complete', message)
-  } catch (error) {
-    showSendNotice('error', 'Bulk Send Failed', error.response?.data?.message || 'Failed to send score summaries.')
-  } finally {
-    sendingBulk.value = false
-  }
-}
-
 const getScoreClassForReview = (percentage) => {
   if (percentage >= 90) return 'score-excellent'
   if (percentage >= 50) return 'score-good'
@@ -792,7 +665,7 @@ const { isRegistered: autoRefreshActive, refreshNow } = useAdminAutoRefresh.scor
 /* Filters */
 .filters-section {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   align-items: end;
   gap: 20px;
   margin-bottom: 32px;
@@ -826,57 +699,6 @@ const { isRegistered: autoRefreshActive, refreshNow } = useAdminAutoRefresh.scor
   outline: none;
   border-color: #007AFF;
   background: #FFFFFF;
-}
-
-.filter-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.btn-send-bulk,
-.btn-send-summary,
-.btn-confirm-send,
-.btn-cancel-send {
-  border: none;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.btn-send-bulk {
-  height: 46px;
-  padding: 0 18px;
-  background: #111827;
-  color: #FFFFFF;
-  white-space: nowrap;
-}
-
-.btn-send-bulk:hover:not(:disabled),
-.btn-confirm-send:hover:not(:disabled),
-.btn-send-summary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.18);
-}
-
-.btn-send-bulk:disabled,
-.btn-send-summary:disabled,
-.btn-confirm-send:disabled,
-.btn-cancel-send:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.btn-send-bulk svg,
-.btn-send-summary svg {
-  width: 18px;
-  height: 18px;
-  stroke-width: 2;
 }
 
 /* Loading */
@@ -1055,11 +877,6 @@ const { isRegistered: autoRefreshActive, refreshNow } = useAdminAutoRefresh.scor
     grid-template-columns: 1fr;
   }
 
-  .filter-actions,
-  .btn-send-bulk {
-    width: 100%;
-  }
-
   .students-grid {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -1074,10 +891,6 @@ const { isRegistered: autoRefreshActive, refreshNow } = useAdminAutoRefresh.scor
     gap: 14px;
   }
 
-  .details-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
 }
 .empty-state {
   text-align: center;
@@ -1133,21 +946,6 @@ const { isRegistered: autoRefreshActive, refreshNow } = useAdminAutoRefresh.scor
   align-items: center;
   gap: 16px;
   min-width: 0;
-}
-
-.details-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.btn-send-summary {
-  min-height: 36px;
-  padding: 0 14px;
-  background: #111827;
-  color: #FFFFFF;
-  white-space: nowrap;
 }
 
 .details-title {
@@ -1681,117 +1479,6 @@ const { isRegistered: autoRefreshActive, refreshNow } = useAdminAutoRefresh.scor
 
 .your-label {
   color: #FF3B30;
-}
-
-.send-confirm-modal {
-  background: #FFFFFF;
-  border-radius: 16px;
-  width: min(460px, 100%);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
-  overflow: hidden;
-}
-
-.send-confirm-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 18px;
-  padding: 24px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.send-confirm-header h3 {
-  margin: 0 0 6px;
-  font-size: 20px;
-  color: #111827;
-  letter-spacing: -0.3px;
-}
-
-.send-confirm-header p {
-  margin: 0;
-  font-size: 14px;
-  color: #6B7280;
-  line-height: 1.5;
-}
-
-.send-confirm-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 18px 24px 24px;
-}
-
-.btn-cancel-send {
-  padding: 10px 16px;
-  background: #F3F4F6;
-  color: #111827;
-}
-
-.btn-confirm-send {
-  padding: 10px 16px;
-  background: #111827;
-  color: #FFFFFF;
-}
-
-.send-notification {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  z-index: 11000;
-  width: min(420px, calc(100vw - 32px));
-  background: #FFFFFF;
-  border-radius: 14px;
-  padding: 16px 48px 16px 18px;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
-  border-left: 4px solid #16A34A;
-}
-
-.send-notification.error {
-  border-left-color: #DC2626;
-}
-
-.send-notification-title {
-  font-size: 14px;
-  font-weight: 800;
-  color: #111827;
-  margin-bottom: 4px;
-}
-
-.send-notification-message {
-  font-size: 13px;
-  color: #4B5563;
-  line-height: 1.45;
-}
-
-.send-notification-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 50%;
-  background: #F3F4F6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.send-notification-close svg {
-  width: 15px;
-  height: 15px;
-}
-
-.notification-slide-enter-active,
-.notification-slide-leave-active {
-  transition: all 0.25s ease;
-}
-
-.notification-slide-enter-from,
-.notification-slide-leave-to {
-  opacity: 0;
-  transform: translateY(12px);
 }
 
 /* Modal Animations */

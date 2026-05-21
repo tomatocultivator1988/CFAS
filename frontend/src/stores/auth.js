@@ -104,6 +104,33 @@ export const useAuthStore = defineStore('auth', () => {
       }
     }
   }
+
+  const updateEmail = async (email) => {
+    try {
+      const response = await api.put('/auth/email', {
+        email: email?.trim() || null
+      })
+
+      if (response.data?.user) {
+        user.value = {
+          ...user.value,
+          ...response.data.user
+        }
+      }
+
+      return {
+        success: true,
+        message: response.data?.message || 'Email address saved successfully.'
+      }
+    } catch (error) {
+      const validationMessage = error.response?.data?.errors?.email?.[0]
+
+      return {
+        success: false,
+        error: validationMessage || error.response?.data?.message || 'Failed to save email address'
+      }
+    }
+  }
   
   return {
     user,
@@ -112,6 +139,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     logout,
     validateSession,
-    changePassword
+    changePassword,
+    updateEmail
   }
 })

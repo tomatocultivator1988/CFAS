@@ -40,6 +40,7 @@ Route::middleware(['auth.token', 'log.api', 'sanitize'])->group(function () {
     Route::get('/auth/validate', [AuthController::class, 'validateSession']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
+    Route::put('/auth/email', [AuthController::class, 'updateEmail']);
     Route::post('/auth/change-password', [AuthController::class, 'changePassword']);
     
     // Reviewee routes (with IP restriction for exam taking)
