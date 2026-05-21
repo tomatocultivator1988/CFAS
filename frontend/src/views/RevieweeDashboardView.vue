@@ -54,9 +54,42 @@
       </div>
     </div>
 
+    <header class="mobile-topbar">
+      <div class="mobile-brand">
+        <img src="/cfas-logo.jpg" alt="CFAS Logo" class="mobile-logo" onerror="this.style.display='none'" />
+        <div>
+          <h1>CFAS Review Hub</h1>
+          <p>Reviewee Portal</p>
+        </div>
+      </div>
+
+      <button @click="handleLogout" class="mobile-logout" type="button" aria-label="Logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        </svg>
+      </button>
+    </header>
+
     <div class="main-content">
       <router-view />
     </div>
+
+    <nav class="mobile-tabbar" aria-label="Reviewee navigation">
+      <router-link to="/exams" class="mobile-tab" exact-active-class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        </svg>
+        <span>My Exams</span>
+      </router-link>
+
+      <router-link to="/exams/email" class="mobile-tab" active-class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M4 4h16v16H4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          <path d="M4 7l8 6 8-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        </svg>
+        <span>Score Email</span>
+      </router-link>
+    </nav>
 
     <!-- Logout Confirmation Modal -->
     <transition name="modal-fade">
@@ -191,7 +224,7 @@ const confirmLogout = async () => {
   font-size: 17px;
   font-weight: 700;
   color: #1D1D1F;
-  letter-spacing: -0.3px;
+  letter-spacing: 0;
 }
 
 .logo-text p {
@@ -199,7 +232,7 @@ const confirmLogout = async () => {
   font-size: 12px;
   color: #86868B;
   font-weight: 500;
-  letter-spacing: -0.1px;
+  letter-spacing: 0;
 }
 
 .sidebar-nav {
@@ -218,7 +251,7 @@ const confirmLogout = async () => {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 15px;
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: 0;
   margin-bottom: 8px;
   cursor: pointer;
 }
@@ -282,7 +315,7 @@ const confirmLogout = async () => {
   font-size: 14px;
   font-weight: 600;
   color: #1D1D1F;
-  letter-spacing: -0.2px;
+  letter-spacing: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -292,7 +325,7 @@ const confirmLogout = async () => {
   font-size: 12px;
   color: #86868B;
   font-weight: 500;
-  letter-spacing: -0.1px;
+  letter-spacing: 0;
 }
 
 .btn-logout {
@@ -309,7 +342,7 @@ const confirmLogout = async () => {
   cursor: pointer;
   font-weight: 600;
   font-size: 15px;
-  letter-spacing: -0.2px;
+  letter-spacing: 0;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -332,6 +365,11 @@ const confirmLogout = async () => {
   flex: 1;
   margin-left: 280px;
   overflow-y: auto;
+}
+
+.mobile-topbar,
+.mobile-tabbar {
+  display: none;
 }
 
 /* iOS-Style Logout Modal */
@@ -381,7 +419,7 @@ const confirmLogout = async () => {
   font-weight: 700;
   color: #1D1D1F;
   margin: 0 0 12px 0;
-  letter-spacing: -0.5px;
+  letter-spacing: 0;
 }
 
 .modal-message {
@@ -389,7 +427,7 @@ const confirmLogout = async () => {
   color: #86868B;
   line-height: 1.5;
   margin: 0 0 28px 0;
-  letter-spacing: -0.2px;
+  letter-spacing: 0;
 }
 
 .modal-actions {
@@ -408,7 +446,7 @@ const confirmLogout = async () => {
   border-radius: 12px;
   font-size: 15px;
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: 0;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -523,68 +561,153 @@ const confirmLogout = async () => {
 
 @media (max-width: 768px) {
   .sidebar {
-    width: 100%;
-    transform: translateX(-100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .sidebar.mobile-open {
-    transform: translateX(0);
+    display: none;
   }
   
   .main-content {
     margin-left: 0;
     width: 100%;
+    min-height: 100vh;
+    padding-top: 68px;
+    padding-bottom: 92px;
   }
-  
-  .sidebar-header {
-    padding: 24px 20px;
+
+  .mobile-topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2000;
+    min-height: 64px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
   }
-  
-  .logo-text h2 {
-    font-size: 16px;
+
+  .mobile-brand {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 11px;
   }
-  
-  .logo-text p {
+
+  .mobile-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  .mobile-brand h1 {
+    margin: 0;
+    color: #1D1D1F;
+    font-size: 15px;
+    font-weight: 760;
+    line-height: 1.15;
+    letter-spacing: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-brand p {
+    margin: 2px 0 0;
+    color: #86868B;
     font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0;
   }
-  
-  .sidebar-nav {
-    padding: 20px 12px;
+
+  .mobile-logout {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 12px;
+    background: rgba(255, 59, 48, 0.1);
+    color: #FF3B30;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    cursor: pointer;
   }
-  
-  .nav-item {
-    padding: 10px 14px;
-    font-size: 14px;
-  }
-  
-  .nav-icon {
+
+  .mobile-logout svg {
     width: 20px;
     height: 20px;
+    stroke-width: 2;
   }
-  
-  .sidebar-footer {
+
+  .mobile-tabbar {
+    position: fixed;
+    left: 14px;
+    right: 14px;
+    bottom: 12px;
+    z-index: 2000;
+    min-height: 64px;
+    padding: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 22px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.16);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .mobile-tab {
+    min-width: 0;
+    min-height: 48px;
+    border-radius: 16px;
+    color: #86868B;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 760;
+    letter-spacing: 0;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .mobile-tab svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+    flex-shrink: 0;
+  }
+
+  .mobile-tab span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-tab.active {
+    color: #007AFF;
+    background: rgba(0, 122, 255, 0.12);
+  }
+
+  .mobile-tab:active,
+  .mobile-logout:active {
+    transform: scale(0.98);
+  }
+
+  .modal-overlay {
     padding: 16px;
   }
-  
-  .user-info {
-    padding: 10px;
-  }
-  
-  .user-avatar {
-    width: 36px;
-    height: 36px;
-  }
-  
-  .user-name {
-    font-size: 13px;
-  }
-  
-  .btn-logout {
-    padding: 10px 14px;
-    font-size: 14px;
-  }
-  
+
   .logout-modal {
     max-width: 90%;
     padding: 28px 24px;
@@ -601,66 +724,52 @@ const confirmLogout = async () => {
 }
 
 @media (max-width: 480px) {
-  .sidebar-header {
-    padding: 20px 16px;
+  .main-content {
+    padding-top: 64px;
+    padding-bottom: 86px;
   }
-  
-  .logo-image {
-    width: 40px;
-    height: 40px;
+
+  .mobile-topbar {
+    min-height: 60px;
+    padding: 9px 12px;
   }
-  
-  .logo-text h2 {
-    font-size: 15px;
+
+  .mobile-logo {
+    width: 34px;
+    height: 34px;
   }
-  
-  .logo-text p {
+
+  .mobile-brand h1 {
+    font-size: 14px;
+  }
+
+  .mobile-brand p {
     font-size: 10px;
   }
-  
-  .sidebar-nav {
-    padding: 16px 12px;
+
+  .mobile-logout {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
   }
-  
-  .nav-item {
-    padding: 10px 12px;
-    font-size: 13px;
-    margin-bottom: 6px;
+
+  .mobile-tabbar {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    min-height: 58px;
+    padding: 7px;
+    border-radius: 20px;
   }
-  
-  .sidebar-footer {
-    padding: 12px;
-  }
-  
-  .user-info {
-    padding: 8px;
-    margin-bottom: 10px;
-  }
-  
-  .user-avatar {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .user-avatar svg {
-    width: 18px;
-    height: 18px;
-  }
-  
-  .user-name {
+
+  .mobile-tab {
+    min-height: 44px;
+    gap: 6px;
     font-size: 12px;
+    border-radius: 14px;
   }
-  
-  .user-role {
-    font-size: 11px;
-  }
-  
-  .btn-logout {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-  
-  .btn-logout svg {
+
+  .mobile-tab svg {
     width: 18px;
     height: 18px;
   }

@@ -822,7 +822,7 @@ const confirmEmailAction = async () => {
 @media (max-width: 768px) {
   .settings-shell {
     width: calc(100% - 32px);
-    padding: 22px 0 36px;
+    padding: 18px 0 28px;
   }
 
   .page-hero {
@@ -888,6 +888,118 @@ const confirmEmailAction = async () => {
 
   .confirm-actions {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .settings-shell {
+    width: calc(100% - 24px);
+  }
+
+  .back-link {
+    min-height: 26px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+
+  .page-hero h1 {
+    font-size: 28px;
+  }
+
+  .page-hero p {
+    font-size: 14px;
+  }
+
+  .status-capsule {
+    min-height: 30px;
+    padding: 6px 11px;
+    font-size: 12px;
+  }
+
+  .settings-group {
+    border-radius: 16px;
+  }
+
+  .recipient-row {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 13px;
+  }
+
+  .recipient-row .row-state {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: -4px;
+  }
+
+  .row-leading {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .row-leading svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .row-copy h2 {
+    font-size: 16px;
+  }
+
+  .row-copy p {
+    font-size: 13px;
+  }
+
+  .input-action-row input,
+  .btn-primary {
+    height: 44px;
+  }
+
+  .destructive-row {
+    min-height: 52px;
+    padding: 0 16px;
+    font-size: 14px;
+  }
+
+  .report-group .settings-row {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 13px;
+  }
+
+  .row-divider {
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+
+  .feature-row {
+    min-height: auto;
+    padding: 12px 18px;
+    align-items: flex-start;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 380px) {
+  .settings-shell {
+    width: calc(100% - 20px);
+  }
+
+  .settings-row {
+    padding: 16px;
+  }
+
+  .email-form {
+    padding: 0 16px 16px;
+  }
+
+  .page-hero h1 {
+    font-size: 26px;
+  }
+
+  .confirm-dialog {
+    padding: 22px 18px 18px;
   }
 }
 </style>
