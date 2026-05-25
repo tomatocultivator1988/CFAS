@@ -522,6 +522,8 @@ import { useAdminStore } from '@/stores/admin'
 import ExamForm from '@/components/admin/ExamForm.vue'
 import QuestionForm from '@/components/admin/QuestionForm.vue'
 
+const AUTH_TOKEN_KEY = 'auth_token'
+
 const route = useRoute()
 const router = useRouter()
 const adminStore = useAdminStore()
@@ -1092,6 +1094,7 @@ const handleDocxImport = async () => {
 
   // Get initial question count
   const initialCount = questions.value.length
+  let pollInterval = null
 
   try {
     // Create FormData to send the file
@@ -1103,7 +1106,7 @@ const handleDocxImport = async () => {
     uploadProgress.value = 1
     
     // Start polling for question count updates
-    const pollInterval = setInterval(async () => {
+    pollInterval = setInterval(async () => {
       try {
         const result = await adminStore.getExam(examId.value)
         if (result.success) {
@@ -1130,9 +1133,14 @@ const handleDocxImport = async () => {
     
     
     // Upload the file to backend for parsing and saving
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/questions/import-docx`, {
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
+    const authToken = localStorage.getItem(AUTH_TOKEN_KEY)
+    const headers = authToken ? { Authorization: `Bearer ${authToken}` } : {}
+
+    const response = await fetch(`${apiBaseUrl}/admin/questions/import-docx`, {
       method: 'POST',
       credentials: 'include',
+      headers,
       body: formData
     })
 
@@ -1171,6 +1179,9 @@ const handleDocxImport = async () => {
     console.error('Import error:', error)
     importError.value = 'Failed to upload file: ' + error.message
   } finally {
+    if (pollInterval) {
+      clearInterval(pollInterval)
+    }
     importing.value = false
   }
 }
